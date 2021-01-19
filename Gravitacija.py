@@ -28,8 +28,8 @@ def GravAccel(delci, thetamax=0.7, G=1.):
     points = np.array(points)
     masses = np.array(masses)
 
-    center = (np.max(points,axis=0)+np.min(points,axis=0))/2       #  center of bounding box
-    topsize = np.max(np.max(points,axis=0)-np.min(points,axis=0))  #  size of bounding box
+    center = (np.max(points,axis=0)+np.min(points,axis=0))/2       #center of bounding box
+    topsize = np.max(np.max(points,axis=0)-np.min(points,axis=0))  #size of bounding box
     leaves = []  # want to keep track of leaf nodes
     topnode = OctNode(center, topsize, masses, points, np.arange(len(masses)), leaves) #build the tree
  
@@ -39,6 +39,11 @@ def GravAccel(delci, thetamax=0.7, G=1.):
         accel[leaf.id] = leaf.g  # get the stored acceleration
     for i, delec in enumerate(delci):
         delec.a = accel[i]
+        
+        a_kot = math.atan2(delec.a[1], delec.a[0])
+        a_posp = math.hypot(delec.a[0], delec.a[1])
+        (delec.kot, delec.v) = addVectors(delec.kot, delec.v, a_kot, a_posp)
+
     #return accel
 
 def addVectors(kot1, v1, kot2, v2):
@@ -51,10 +56,12 @@ def addVectors(kot1, v1, kot2, v2):
 
 def združi(p1, p2):
     if math.hypot(p1.x - p2.x, p1.y - p2.y) < p1.size + p2.size:
+
         total_masa = p1.masa + p2.masa
         p1.x = (p1.x*p1.masa + p2.x*p2.masa)/total_masa
         p1.y = (p1.y*p1.masa + p2.y*p2.masa)/total_masa
         (p1.kot, p1.v) = addVectors(p1.kot, p1.v*p1.masa/total_masa, p2.kot, p2.v*p2.masa/total_masa)
+
         #p1.v *= (p1.elastičnost*p2.elastičnost)
         p1.masa += p2.masa
         p1.collide_with = p2
@@ -137,6 +144,8 @@ class Particle:
         self.a = [0,0]
 
     def premik(self):
+        
+        
         self.x += np.cos(self.kot) * self.v
         self.y += np.sin(self.kot) * self.v
         self.v *= self.upor
@@ -145,11 +154,7 @@ class Particle:
     def pospešek(self, vector):
         (self.kot, self.v) = addVectors(self.kot, self.v, *vector)
 
-    def pospešek2(self, sez_pospeškov):
-        for a in sez_pospeškov:
-            a_kot = math.atan2(a[1], a[0])
-            a_posp = math.hypot(a[0], a[1])
-            (self.kot, self.v) = addVectors(self.kot, self.v, a_kot, a_posp)
+    
 
     def pospešek3(self):
         a_kot = math.atan2(self.a[1], self.a[0])
@@ -175,7 +180,8 @@ class Particle:
         force = 0.2 * self.masa * other.masa / dist ** 2
         self.pospešek((theta + np.pi, force/self.masa))
         other.pospešek((theta, force/other.masa))
-
+    
+    
 
 
 class Okolje:
@@ -201,7 +207,8 @@ class Okolje:
         'pospešek': (1, lambda p: p.pospešek(self.g)),
         'trk': (2, lambda p1, p2: trk(p1, p2)),
         "privlak": (2, lambda p1, p2: p1.privlak(p2)),
-        "združi": (2, lambda p1, p2: združi(p1, p2))}
+        "združi": (2, lambda p1, p2: združi(p1, p2)),
+        "ohranitev_GK": (2, lambda p1, p2: združi(p1, p2))}
 
     def addFunctions(self, function_list):
 
@@ -232,19 +239,26 @@ class Okolje:
 
             self.delci.append(delec)
 
+    def pospešek2(self):
+        for delec in self.delci:
+            a_kot = math.atan2(delec.a[1], delec.a[0])
+            a_posp = math.hypot(delec.a[0], delec.a[1])
+            (delec.kot, delec.v) = addVectors(delec.kot, delec.v, a_kot, a_posp)
+    
     def update(self):
-        GravAccel(self.delci)
+        #GravAccel(self.delci)
         #sez_posp = GravAccel(self.delci)
-        
+        #self.ohranitev_GK()
+        GravAccel(self.delci)
+        #self.pospešek2()
         for i, delec in enumerate(self.delci):
-            #delec.pospešek2(sez_posp)
-            #break
-            delec.pospešek3()
             for f in self.particle_functions1:
                 f(delec)
             for delec2 in self.delci[i+1:]:
                 for f in self.particle_functions2:
                     f(delec, delec2)
+        
+            
             
 
     def odboj(self, delec):
@@ -272,5 +286,15 @@ class Okolje:
                 return delc
         return None
 
+    def ohranitev_GK(self):
+        skupna_GK = np.array([0,0])
+        skupna_Sila = np.array([0,0])
+        for delec in self.delci:
+            skupna_GK = addVectors(delec.kot, delec.v*delec.masa, *skupna_GK)
+            a = np.array(delec.a)
+            skupna_Sila = delec.masa*a + skupna_Sila
 
 
+            #skupna_Sila = skupna_Sila + delec.a*delec.masa
+            
+            #skupna_Sila = skupna_Sila + delec.a*delec.masa

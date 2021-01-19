@@ -15,7 +15,7 @@ env.addFunctions(["premik", "združi", "miška"])
 def radij(masa):
     return  masa**0.5
 
-for p in range(2):
+for p in range(100):
     particle_masa = random.randint(1,4)
     particle_size = radij(particle_masa)
     env.dodaj_delec(masa=particle_masa, size=particle_size, v=0, barva=(255,255,255))
