@@ -4,7 +4,7 @@ import Gravitacija
 import numpy as np
 
 width, height = 700, 400
-
+#test 
 class UniverseScreen:
     def __init__ (self, width, height):
         self.width = width
