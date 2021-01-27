@@ -81,7 +81,6 @@ while running:
             elif event.key == pygame.K_SPACE:
                 paused = not paused
 
-
     if izbrani:
         x_miš = pygame.mouse.get_pos()[0]
         y_miš = pygame.mouse.get_pos()[1]

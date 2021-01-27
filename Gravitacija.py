@@ -249,7 +249,7 @@ class Okolje:
         #GravAccel(self.delci)
         #sez_posp = GravAccel(self.delci)
         #self.ohranitev_GK()
-        GravAccel(self.delci)
+        GravAccel(self.delci) #ta funkcija jim že spremeni hitrost
         #self.pospešek2()
         for i, delec in enumerate(self.delci):
             for f in self.particle_functions1:
