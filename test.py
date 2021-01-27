@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-a = []
-for i in range(10):
-    a.append([i, i+1])
-a = np.array(a)
-print(a)
+a = np.array([0,5])
+b = np.array([1,2])
+
+print(a+b)
