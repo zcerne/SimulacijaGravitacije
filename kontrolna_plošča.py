@@ -39,9 +39,9 @@ env.barva = (0,0,0)
 env.addFunctions(["premik", "združi", "miška"])
 
 def radij(masa):
-    return  masa**0.5
+    return  masa**(1/2)
 
-for p in range(100):
+for p in range(200):
     particle_masa = random.randint(1,4)
     particle_size = radij(particle_masa)
     env.dodaj_delec(masa=particle_masa, size=particle_size, v=0, barva=(255,255,255))
@@ -58,8 +58,8 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             x_miš = pygame.mouse.get_pos()[0]
             y_miš = pygame.mouse.get_pos()[1]
-            x_miš = int(universe_screen.mx + (-universe_screen.dx + x_miš) * universe_screen.magnification)
-            y_miš = int(universe_screen.my + (-universe_screen.dy + y_miš) * universe_screen.magnification)
+            x_miš = (x_miš - universe_screen.mx)/universe_screen.magnification - universe_screen.dx
+            y_miš = (y_miš - universe_screen.my)/universe_screen.magnification - universe_screen.dy
             izbrani = env.najdi_delec(x_miš, y_miš)
         elif event.type == pygame.MOUSEBUTTONUP:
             izbrani = None
@@ -84,8 +84,8 @@ while running:
     if izbrani:
         x_miš = pygame.mouse.get_pos()[0]
         y_miš = pygame.mouse.get_pos()[1]
-        x_miš = int(universe_screen.mx + (-universe_screen.dx + x_miš) * universe_screen.magnification)
-        y_miš = int(universe_screen.my + (-universe_screen.dy + y_miš) * universe_screen.magnification)
+        x_miš = (x_miš - universe_screen.mx)/universe_screen.magnification - universe_screen.dx
+        y_miš = (y_miš - universe_screen.my)/universe_screen.magnification - universe_screen.dy
         izbrani.miška(x_miš, y_miš)
     
     
@@ -103,6 +103,7 @@ while running:
             del p.__dict__['collide_with']
         
         x = int(universe_screen.mx + (universe_screen.dx + p.x) * universe_screen.magnification)
+        #x_miš = (pygame.mouse.get_pos()[0] - universe_screen.mx)/universe_screen.magnification - universe_screen.dx
         y = int(universe_screen.my + (universe_screen.dy + p.y) * universe_screen.magnification)
         size = int(p.size * universe_screen.magnification)
 
