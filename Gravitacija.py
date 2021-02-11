@@ -19,7 +19,7 @@ def TreeWalk(node, node0, thetamax=0.7, G=1.0):
             # otherwise split up the node and repeat
             for c in node.children: TreeWalk(c, node0, thetamax, G)
 
-def GravAccel(delci, thetamax=0.7, G=1.):
+def GravAccel(delci, thetamax=0.7, G=1):
     points = []
     masses = []
     for delec in delci:
@@ -142,6 +142,7 @@ class Particle:
         self.upor = 1
         self.elastičnost = 0
         self.a = [0,0]
+        
 
     def premik(self):
         
@@ -229,11 +230,11 @@ class Okolje:
             size = kargs.get('size', random.randint(10, 20))
             masa = kargs.get('masa', random.randint(100, 10000))
             x = kargs.get('x', random.uniform(size, self.širina - size))
-            y = kargs.get('y', random.uniform(size, self.višina - size))
-
+            y = kargs.get('y', random.uniform(size, self.višina - size)
+)
             delec = Particle(x, y, size, masa)
-            delec.v = kargs.get('v', random.random())
-            delec.kot = kargs.get('kot', random.uniform(0, math.pi*2))
+            delec.v = kargs.get('v', 0)
+            delec.kot = kargs.get('kot', 0)
             delec.barva = kargs.get('barva', (0, 0, 255))
             #particle.upor = (particle.masa/(particle.masa + self.masa_of_air)) ** particle.size
 
@@ -249,7 +250,7 @@ class Okolje:
         #GravAccel(self.delci)
         #sez_posp = GravAccel(self.delci)
         #self.ohranitev_GK()
-        GravAccel(self.delci) #ta funkcija jim že spremeni hitrost
+        GravAccel(self.delci, G = 20) #ta funkcija jim že spremeni hitrost
         #self.pospešek2()
         for i, delec in enumerate(self.delci):
             for f in self.particle_functions1:
