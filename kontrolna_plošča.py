@@ -2,6 +2,7 @@ import pygame
 import random
 import Gravitacija
 import numpy as np
+<<<<<<< HEAD
 import math
 
 
@@ -45,6 +46,11 @@ while not key1:
     else:
         print("Error")
 
+=======
+
+width, height = 700, 400
+#test test
+>>>>>>> 96698fcdd77d29daddbf7bbb97620aedb21cd4f7
 class UniverseScreen:
     def __init__ (self, width, height):
         self.width = width
