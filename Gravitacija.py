@@ -66,24 +66,6 @@ def združi(p1, p2):
         p1.masa += p2.masa
         p1.collide_with = p2
 
-
-def trk(k1, k2):
-    dx = k1.x - k2.x
-    dy = k1.y - k2.y
-    d = math.hypot(dx, dy)
-
-    if d <= k1.size + k2.size:
-        tangent = math.atan2(dy, dx)
-        k1.kot = 2 * tangent - k1.kot
-        k2.kot = 2 * tangent - k2.kot
-        (k1.v, k2.v) = (k2.v, k1.v)
-
-        kot = 0.5 * math.pi + tangent
-        k1.x += math.sin(kot)
-        k1.y -= math.cos(kot)
-        k2.x -= math.sin(kot)
-        k2.y += math.cos(kot)
-
 class OctNode:
     """Stores the data for an octree node, and spawns its children if possible"""
     def __init__(self, center, size, masses, points, ids, leaves=[]):
@@ -131,6 +113,7 @@ class OctNode:
 
 class Particle:
     def __init__(self, x, y, size, masa = 1):
+        
         self.x = x
         self.y = y
         self.v = 0
@@ -145,27 +128,13 @@ class Particle:
         
 
     def premik(self):
-        
-        
         self.x += np.cos(self.kot) * self.v
         self.y += np.sin(self.kot) * self.v
         self.v *= self.upor
         
-
     def pospešek(self, vector):
         (self.kot, self.v) = addVectors(self.kot, self.v, *vector)
 
-    
-
-    def pospešek3(self):
-        a_kot = math.atan2(self.a[1], self.a[0])
-        a_posp = math.hypot(self.a[0], self.a[1])
-        (self.kot, self.v) = addVectors(self.kot, self.v, a_kot, a_posp)
-    
-    def upor(self):
-        """ Slow particle down through drag """
-        self.v *= self.upor
-    
     def miška(self, x, y):
         dx = x - self.x
         dy = y - self.y
@@ -182,9 +151,6 @@ class Particle:
         self.pospešek((theta + np.pi, force/self.masa))
         other.pospešek((theta, force/other.masa))
     
-    
-
-
 class Okolje:
 
     def __init__(self, širina, višina):
@@ -195,10 +161,7 @@ class Okolje:
         self.mase = []
         
         self.barva = (255,255,255)
-        #self.mass_of_air = 0.2
-        self.elastičnost = 1
-        self.g = None
-
+        self.G = 1
         self.particle_functions1 = []
         self.particle_functions2 = []
         self.function_dict = {
@@ -239,28 +202,15 @@ class Okolje:
             #particle.upor = (particle.masa/(particle.masa + self.masa_of_air)) ** particle.size
 
             self.delci.append(delec)
-
-    def pospešek2(self):
-        for delec in self.delci:
-            a_kot = math.atan2(delec.a[1], delec.a[0])
-            a_posp = math.hypot(delec.a[0], delec.a[1])
-            (delec.kot, delec.v) = addVectors(delec.kot, delec.v, a_kot, a_posp)
     
     def update(self):
-        #GravAccel(self.delci)
-        #sez_posp = GravAccel(self.delci)
-        #self.ohranitev_GK()
-        GravAccel(self.delci, G = 20) #ta funkcija jim že spremeni hitrost
-        #self.pospešek2()
+        GravAccel(self.delci, G = self.G) #ta funkcija jim že spremeni hitrost
         for i, delec in enumerate(self.delci):
             for f in self.particle_functions1:
                 f(delec)
             for delec2 in self.delci[i+1:]:
                 for f in self.particle_functions2:
                     f(delec, delec2)
-        
-            
-            
 
     def odboj(self, delec):
         if delec.x >= self.širina - delec.size and np.cos(delec.kot) >= 0:
@@ -291,9 +241,9 @@ class Okolje:
         skupna_GK = np.array([0,0])
         skupna_Sila = np.array([0,0])
         for delec in self.delci:
-            skupna_GK = addVectors(delec.kot, delec.v*delec.masa, *skupna_GK)
+            skupna_GK = addVectors(delec.kot, delec.v * delec.masa, *skupna_GK)
             a = np.array(delec.a)
-            skupna_Sila = delec.masa*a + skupna_Sila
+            skupna_Sila = delec.masa * a + skupna_Sila
 
 
             #skupna_Sila = skupna_Sila + delec.a*delec.masa
