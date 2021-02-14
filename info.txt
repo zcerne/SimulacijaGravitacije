@@ -1,0 +1,14 @@
+Uporabljate lahko tipke:
+desni klik - dodaj delec/izbriši delec
+l - določite lokacijo
+m - določite maso/velikost
+v - določite hitrost
+levi klik - določite m, l, v
+d - prikažete/ugasnete informacije o objektu
+s - shranite trenutno stanje v datoteko "saved.txt"
+r - nazaj v začetno stanje
+space - poženi/ustavi simulacijo
++ - zoom in
+- - zoom out 
+puščice - premik po zaslonu
+slider G (levo spodaj) za spremembo graqvitacijske konstante G
