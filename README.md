@@ -5,7 +5,7 @@ Opis:
 Program Simulira vpliv gravitacije med objekti v 2D prostoru. Za računanje sil med delci sem uporabil Barnes-Hutov algoritem.
 Kako deluje.
 
-Za delovanje sta potrebni datoteki Gravitacija.py in Kontrolna_plošča.py. 
+Za delovanje so potrebne 3 datoteke Gravitacija.py, Kontrolna_plošča.py in tekstovni fajl info.txt. 
 poženete program kontrolna plošča, v komandni vrstici se pokaže vprašanje: Naključna razporeditev(y/n)?
 če odgovorite:
 - y, je potrebno vpisati še število delcev, ki jih želite simulirati. 
