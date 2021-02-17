@@ -11,4 +11,4 @@ space - poženi/ustavi simulacijo
 + - zoom in
 - - zoom out 
 puščice - premik po zaslonu
-slider G (levo spodaj) za spremembo graqvitacijske konstante G
+slider G (levo spodaj) za spremembo gravitacijske konstante G

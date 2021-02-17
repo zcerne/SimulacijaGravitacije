@@ -43,6 +43,7 @@ viri:
 https://mikegrudic.wordpress.com/2017/07/11/a-simple-and-pythonic-barnes-hut-treecode/
 http://arborjs.org/docs/barnes-hut
 https://www.petercollingridge.co.uk/tutorials/pygame-physics-simulation/
+https://www.youtube.com/channel/UCfzlCWGWYyIQ0aLC5w48gBQ
 
 
 
