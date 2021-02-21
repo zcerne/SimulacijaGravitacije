@@ -28,8 +28,8 @@ def GravAccel(delci, thetamax=0.7, G=1):
     points = np.array(points)
     masses = np.array(masses)
 
-    center = (np.max(points,axis=0)+np.min(points,axis=0))/2       #center of bounding box
-    topsize = np.max(np.max(points,axis=0)-np.min(points,axis=0))  #size of bounding box
+    center = (np.max(points, axis = 0) + np.min(points,axis = 0)) / 2       #center of bounding box
+    topsize = np.max(np.max(points, axis = 0) - np.min(points, axis = 0))  #size of bounding box
     leaves = []  # want to keep track of leaf nodes
     topnode = OctNode(center, topsize, masses, points, np.arange(len(masses)), leaves) #build the tree
  
@@ -74,7 +74,7 @@ class OctNode:
         self.children = []                      # start out assuming that the node has no children
  
         Npoints = len(points)
- 
+        
         if Npoints == 1:
             # if we're down to one point, we need to store stuff in the node
             leaves.append(self)
@@ -82,6 +82,7 @@ class OctNode:
             self.mass = masses[0]
             self.id = ids[0]
             self.g = np.zeros(2)        # at each point, we will want the gravitational field
+
         else:
             self.GenerateChildren(points, masses, ids, leaves)     # if we have at least 2 points in the node,
                                                              # spawn its children
