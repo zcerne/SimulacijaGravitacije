@@ -40,9 +40,10 @@ brez prazne vrstice na koncu
 
 
 viri:
-https://mikegrudic.wordpress.com/2017/07/11/a-simple-and-pythonic-barnes-hut-treecode/
+Koda v mapi gravitacija ja v znatni meri kopirana iz spodnjih virov. 
+https://mikegrudic.wordpress.com/2017/07/11/a-simple-and-pythonic-barnes-hut-treecode/ - koda uporabljena za Barnes-hut algoritem 
 http://arborjs.org/docs/barnes-hut
-https://www.petercollingridge.co.uk/tutorials/pygame-physics-simulation/
+https://www.petercollingridge.co.uk/tutorials/pygame-physics-simulation/ - Koda uporabljena za nekatere funkcije.
 https://www.youtube.com/channel/UCfzlCWGWYyIQ0aLC5w48gBQ
 
 
