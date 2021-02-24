@@ -74,7 +74,7 @@ def najdi(x_mis, y_mis):
     
     if math.dist((x_mis, y_mis), universe_screen.g_coords) < 10:
         universe_screen.najdi_g = True
-    elif math.dist((x_mis, y_mis), universe_screen.info_gumb) < 20:
+    elif abs(x_mis - universe_screen.info_gumb[0]) < 15 and abs(y_mis - universe_screen.info_gumb[1]) < 15:
         universe_screen.info = not universe_screen.info
         universe_screen.paused = True
     elif abs(x_mis - universe_screen.back_gumb[0]) < 30 and abs(y_mis - universe_screen.back_gumb[1]) < 15:
@@ -349,6 +349,7 @@ while universe_screen.running:
 
     if universe_screen.info:
         universe_screen.info_screen()
+    
     if universe_screen.zagon:
         universe_screen.zacetni_zaslon()
 
@@ -393,8 +394,8 @@ while universe_screen.running:
         y = int(universe_screen.my + (universe_screen.dy + p.y) * universe_screen.magnification)
         size = int(p.size * universe_screen.magnification)
 
-        if p.size < 1:
-            pygame.draw.circle(screen, p.barva, (x, y, 2, 2), radius = 1)
+        if size < 2:
+            pygame.draw.circle(screen, p.barva, (x, y), radius = 2)
         else:
             pygame.draw.circle(screen, p.barva, (x, y), size)
         
@@ -421,7 +422,7 @@ while universe_screen.running:
     pygame.draw.rect(screen, color = (0,255,255), rect = (universe_screen.g_coords[0], universe_screen.g_coords[1], 10, 10))
     message_to_screen("G = " + str(round(env.G, 1)), (0,255,255), [universe_screen.g_coords[0], universe_screen.g_coords[1] + 10], 15)
     
-    pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.info_gumb[0] - 15, universe_screen.info_gumb[1] - 15 , 30, 30), width = 2)
+    pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.info_gumb[0] - 15, universe_screen.info_gumb[1] - 15, 30, 30), width = 2)
     message_to_screen("i", (255,255,255), [universe_screen.info_gumb[0] - 2, universe_screen.info_gumb[1] - 7], 25)
 
     pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.back_gumb[0] - 30, universe_screen.back_gumb[1] - 15, 60, 30), width = 2)
