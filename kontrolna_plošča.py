@@ -30,7 +30,7 @@ def zagon():
     key1 = False
     while not key1:
         print("Nakjučna postavitev?(y\\n)")
-        input1 = input() 
+        input1 = input()
         if input1 == "y":
             nakljucna_razporeditev = True
             print("Vpišite število delcev")
@@ -74,6 +74,14 @@ def najdi(x_mis, y_mis):
     
     if math.dist((x_mis, y_mis), universe_screen.g_coords) < 10:
         universe_screen.najdi_g = True
+    elif math.dist((x_mis, y_mis), universe_screen.a_coords) < 10:
+        universe_screen.najdi_a = True
+    elif math.dist((x_mis, y_mis), universe_screen.framePlus) < 25:
+        universe_screen.frames +=1
+        universe_screen.neka_stevilka = 0
+    elif math.dist((x_mis, y_mis), universe_screen.frameMinus) < 25:
+        universe_screen.frames -=1 if universe_screen.frames > 1 else 0
+        universe_screen.neka_stevilka = 0
     elif abs(x_mis - universe_screen.info_gumb[0]) < 15 and abs(y_mis - universe_screen.info_gumb[1]) < 15:
         universe_screen.info = not universe_screen.info
         universe_screen.paused = True
@@ -84,7 +92,6 @@ def najdi(x_mis, y_mis):
         universe_screen.paused = True
         universe_screen.zagon = True
 
-
 def premik_g(x_mis):
     universe_screen.g_coords[0] = preslikava(x_mis, 0)[0]
     if universe_screen.g_coords[0] < universe_screen.g_os1[0]:
@@ -93,6 +100,15 @@ def premik_g(x_mis):
         universe_screen.g_coords[0] = universe_screen.g_os2[0]
 
     env.G = universe_screen.max_G*(1 - (universe_screen.g_os2[0] - universe_screen.g_coords[0])/(universe_screen.g_os2[0] - universe_screen.g_os1[0]))
+
+def premik_a(x_mis):
+    universe_screen.a_coords[0] = preslikava(x_mis, 0)[0]
+    if universe_screen.a_coords[0] < universe_screen.a_os1[0]:
+        universe_screen.a_coords[0] = universe_screen.a_os1[0]
+    elif universe_screen.a_coords[0] > universe_screen.a_os2[0]:
+        universe_screen.a_coords[0] = universe_screen.a_os2[0]
+
+    env.A = universe_screen.max_A*(1 - (universe_screen.a_os2[0] - universe_screen.a_coords[0])/(universe_screen.a_os2[0] - universe_screen.a_os1[0]))
 
 #def info_screen():
 
@@ -122,6 +138,9 @@ def razporedi(nakljucna_razporeditev, n_delcev = None, datoteka = None):
             env.dodaj_delec(masa=particle_masa, size=particle_size, x = particle_x, y = particle_y, 
                             v = particle_v, kot = particle_kot, barva = (255,255,255))
 
+update = pygame.USEREVENT + 1
+pygame.time.set_timer(update, 10) #na vsake 10ms updata
+
 #test test
 class UniverseScreen:
     def __init__ (self, width, height):
@@ -143,6 +162,17 @@ class UniverseScreen:
         
         self.g_coords = [(1/30 - 1)*(180) + 200, height - 25]
 
+        self.max_A = 1
+        self.najdi_a = False
+        self.a_os1 = (20, height - 40)
+        self.a_os2 = (200, height - 40)
+
+        self.a_coords = [0.7*200, height - 45]
+
+        self.frames = 1 # število kalkulacij na frame
+        self.framePlus = (25, height - 200)
+        self.frameMinus = (25, height - 135)
+        self.neka_stevilka = 0
         self.info_gumb = (width - 15, height - 15)
         self.info = False
 
@@ -162,6 +192,8 @@ class UniverseScreen:
         self.dx, self.dy = 0, 0
         self.mx, self.my = 0, 0
         self.magnification = 1.0
+    
+    
 
     def info_screen(self):
         while self.info:
@@ -174,18 +206,18 @@ class UniverseScreen:
                     y_miš = pygame.mouse.get_pos()[1]
                     najdi(x_miš, y_miš)
 
-                screen.fill((255, 255, 255))
-                message_to_screen("Info", (0,0,0), [width/2, 20], 30)
-                info = open("info.txt", "r", encoding = "utf-8")
-                info_lines = info.readlines()
-                for i, line in enumerate(info_lines):
-                    line = line.strip()
-                    message_to_screen(line, (0,0,0), [10, 30*i + 50], 30)
-                
-                pygame.draw.rect(screen, color = (0,0,0), rect = (universe_screen.info_gumb[0] - 15, universe_screen.info_gumb[1] - 15 , 30, 30), width = 2)
-                message_to_screen("X", (0,0,0), [universe_screen.info_gumb[0] - 2, universe_screen.info_gumb[1] - 7], 25)
-                clock.tick(15)
-                pygame.display.flip()
+            screen.fill((255, 255, 255))
+            message_to_screen("Info", (0,0,0), [width/2, 20], 30)
+            info = open("info.txt", "r", encoding = "utf-8")
+            info_lines = info.readlines()
+            for i, line in enumerate(info_lines):
+                line = line.strip()
+                message_to_screen(line, (0,0,0), [10, 30*i + 50], 30)
+            
+            pygame.draw.rect(screen, color = (0,0,0), rect = (universe_screen.info_gumb[0] - 15, universe_screen.info_gumb[1] - 15 , 30, 30), width = 2)
+            message_to_screen("X", (0,0,0), [universe_screen.info_gumb[0] - 2, universe_screen.info_gumb[1] - 7], 25)
+            clock.tick(15)
+            pygame.display.flip()
         
     def zacetni_zaslon(self):
         st = ""
@@ -225,16 +257,16 @@ class UniverseScreen:
                         je_stevilo = re.match(r'^([\s\d]+)$', st)
                         if je_stevilo != None:
                             n_delcev = int(st)
-                            if n_delcev < 300:
-                                razporedi(nakljucna_razporeditev = True, n_delcev = n_delcev, datoteka = None)
-                                shrani_zacetni_pogoj(env.delci, datoteka = "zacetno_stanje.txt")
-                                self.zagon = False
-                            else:
-                                screen.fill((0,0,0))
-                                message_to_screen("Poskusite manj od 300", (255, 255, 255), [width/3,height/2], 40)
-                                st = ""
-                                pygame.display.flip()
-                                time.sleep(2)
+                            # if n_delcev < 1000:
+                            razporedi(nakljucna_razporeditev = True, n_delcev = n_delcev, datoteka = None)
+                            shrani_zacetni_pogoj(env.delci, datoteka = "zacetno_stanje.txt")
+                            self.zagon = False
+                            # else:
+                            #     screen.fill((0,0,0))
+                            #     message_to_screen("Poskusite manj od 300", (255, 255, 255), [width/3,height/2], 40)
+                            #     st = ""
+                            #     pygame.display.flip()
+                            #     time.sleep(2)
                         else:
                             screen.fill((0,0,0))
                             message_to_screen("Poskusite s številom", (255, 255, 255), [width/3,height/2], 40)
@@ -280,7 +312,6 @@ lokacija = False
 hitrost = False
 masa = False
 start = 0
-
 universe_screen.zacetni_zaslon()
 
 while universe_screen.running:
@@ -305,6 +336,7 @@ while universe_screen.running:
         elif event.type == pygame.MOUSEBUTTONUP:
             izbrani = None
             universe_screen.najdi_g = False
+            universe_screen.najdi_a = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 universe_screen.scroll(dx=1)
@@ -314,9 +346,9 @@ while universe_screen.running:
                 universe_screen.scroll(dy=1)
             elif event.key == pygame.K_DOWN:
                 universe_screen.scroll(dy=-1)
-            elif event.key == pygame.K_KP_PLUS:
+            elif event.key == pygame.K_KP_PLUS or event.key == pygame.K_PLUS:
                 universe_screen.zoom(2)
-            elif event.key == pygame.K_KP_MINUS:
+            elif event.key == pygame.K_KP_MINUS or event.key == pygame.K_MINUS:
                 universe_screen.zoom(0.5)
             elif event.key == pygame.K_r:
                 universe_screen.reset()
@@ -345,6 +377,8 @@ while universe_screen.running:
                 lokacija = False
             elif event.key == pygame.K_d:
                 universe_screen.prikaz_vrednosti = not universe_screen.prikaz_vrednosti
+        elif event.type == update:
+            pygame.display.flip()
                 
 
     if universe_screen.info:
@@ -353,16 +387,15 @@ while universe_screen.running:
     if universe_screen.zagon:
         universe_screen.zacetni_zaslon()
 
-    
-    screen.fill(env.barva)
-    
-    if izbrani or universe_screen.najdi_g:
+    if izbrani or universe_screen.najdi_g or universe_screen.najdi_a:
         x_miš = pygame.mouse.get_pos()[0]
         y_miš = pygame.mouse.get_pos()[1]
         x_miš = (x_miš - universe_screen.mx)/universe_screen.magnification - universe_screen.dx
         y_miš = (y_miš - universe_screen.my)/universe_screen.magnification - universe_screen.dy
         if universe_screen.najdi_g:
             premik_g(x_miš)
+        elif universe_screen.najdi_a:
+            premik_a(x_miš)
         elif universe_screen.paused:
             if lokacija:
                 izbrani.x = x_miš
@@ -383,6 +416,10 @@ while universe_screen.running:
         env.update()
 
     particles_to_remove = []
+    
+    universe_screen.neka_stevilka += 1
+    if universe_screen.frames == universe_screen.neka_stevilka: #posodobi zaslon le na vsake nekaj krogov
+        screen.fill(env.barva)
     for p in env.delci:
         if 'collide_with' in p.__dict__:
             
@@ -394,21 +431,50 @@ while universe_screen.running:
         y = int(universe_screen.my + (universe_screen.dy + p.y) * universe_screen.magnification)
         size = int(p.size * universe_screen.magnification)
 
-        if size < 2:
-            pygame.draw.circle(screen, p.barva, (x, y), radius = 2)
-        else:
-            pygame.draw.circle(screen, p.barva, (x, y), size)
+        
+        if universe_screen.frames == universe_screen.neka_stevilka: #posodobi zaslon le na vsake nekaj krogov
+            if size < 1:
+                pygame.draw.circle(screen, p.barva, (x, y), radius = 1)
+            else:
+                pygame.draw.circle(screen, p.barva, (x, y), size)
         
         #vektor hitrosti
-        if universe_screen.paused:
-            end_pos = (x + 10 * p.v * math.cos(p.kot), y + 10 * p.v * math.sin(p.kot))
-            pygame.draw.line(screen, color = (0,255,0), width = 2, start_pos = (x, y), end_pos = end_pos)
+            if universe_screen.paused:
+                end_pos = (x + 10 * p.v * math.cos(p.kot), y + 10 * p.v * math.sin(p.kot))
+                pygame.draw.line(screen, color = (0,255,0), width = 2, start_pos = (x, y), end_pos = end_pos)
 
-        if universe_screen.prikaz_vrednosti:
-            message_to_screen("m = " + str(int(p.masa)), (240, 0, 0), [x, y], 15)
-            message_to_screen("v = " + str(round(p.v, 2)), (240, 0, 0), [x, y + 9], 15)
+            if universe_screen.prikaz_vrednosti:
+                message_to_screen("m = " + str(int(p.masa)), (240, 0, 0), [x, y], 15)
+                message_to_screen("v = " + str(round(p.v, 2)), (240, 0, 0), [x, y + 9], 15)
     
+    if universe_screen.frames == universe_screen.neka_stevilka:
+        pygame.draw.line(screen, color = (0,255,255), width = 2, start_pos = universe_screen.g_os1, end_pos = universe_screen.g_os2)
+        pygame.draw.rect(screen, color = (0,255,255), rect = (universe_screen.g_coords[0], universe_screen.g_coords[1], 10, 10))
+        message_to_screen("G = " + str(round(env.G, 1)), (0,255,255), [universe_screen.g_coords[0], universe_screen.g_coords[1] + 10], 15)
+
+        pygame.draw.line(screen, color = (0,255,255), width = 2, start_pos = universe_screen.a_os1, end_pos = universe_screen.a_os2)
+        pygame.draw.rect(screen, color = (0,255,255), rect = (universe_screen.a_coords[0], universe_screen.a_coords[1], 10, 10))
+        message_to_screen("A = " + str(round(env.A, 2)), (0,255,255), [universe_screen.a_coords[0], universe_screen.a_coords[1] + 10], 15)
+        
+        pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.info_gumb[0] - 15, universe_screen.info_gumb[1] - 15, 30, 30), width = 2)
+        message_to_screen("i", (255,255,255), [universe_screen.info_gumb[0] - 2, universe_screen.info_gumb[1] - 7], 25)
+
+        pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.back_gumb[0] - 30, universe_screen.back_gumb[1] - 15, 60, 30), width = 2)
+        message_to_screen("back", (255,255,255), [universe_screen.back_gumb[0] - 15, universe_screen.back_gumb[1] - 7], 25)
+
+        pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.framePlus[0] - 15, universe_screen.framePlus[1] - 15, 30, 30), width = 2)
+        message_to_screen("+", (255,255,255), [universe_screen.framePlus[0]-10, universe_screen.framePlus[1]-18], 50)
+
+        message_to_screen(str(universe_screen.frames), (255,255,255), [universe_screen.framePlus[0]-10, universe_screen.framePlus[1]+20], 35)
+
+        pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.frameMinus[0] - 15, universe_screen.frameMinus[1] - 15, 30, 30), width = 2)
+        message_to_screen("-", (255,255,255), [universe_screen.frameMinus[0]-10, universe_screen.frameMinus[1]-18], 50)
+        #pygame.draw.circle(screen, (255,255,255), universe_screen.back_gumb, 10)
+        universe_screen.neka_stevilka = 0
+
     if universe_screen.paused:
+        message_to_screen("Za zagon pritisnite SPACE", (255, 255, 255), [width/3, 10], 30)
+        
         if lokacija:
             message_to_screen("Določite koordinate", (255, 255, 255), [10, 10], 30)
         elif masa:
@@ -418,21 +484,15 @@ while universe_screen.running:
 
     
     
-    pygame.draw.line(screen, color = (0,255,255), width = 2, start_pos = universe_screen.g_os1, end_pos = universe_screen.g_os2)
-    pygame.draw.rect(screen, color = (0,255,255), rect = (universe_screen.g_coords[0], universe_screen.g_coords[1], 10, 10))
-    message_to_screen("G = " + str(round(env.G, 1)), (0,255,255), [universe_screen.g_coords[0], universe_screen.g_coords[1] + 10], 15)
     
-    pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.info_gumb[0] - 15, universe_screen.info_gumb[1] - 15, 30, 30), width = 2)
-    message_to_screen("i", (255,255,255), [universe_screen.info_gumb[0] - 2, universe_screen.info_gumb[1] - 7], 25)
-
-    pygame.draw.rect(screen, color = (255,255,255), rect = (universe_screen.back_gumb[0] - 30, universe_screen.back_gumb[1] - 15, 60, 30), width = 2)
-    message_to_screen("back", (255,255,255), [universe_screen.back_gumb[0] - 15, universe_screen.back_gumb[1] - 7], 25)
-    #pygame.draw.circle(screen, (255,255,255), universe_screen.back_gumb, 10)
+    
+    
     particles_to_remove = set(particles_to_remove)
     for p in particles_to_remove:
         env.delci.remove(p)
 
-    pygame.display.flip()
-    clock.tick(80)
+
+    
+    # clock.tick(6)
 
 

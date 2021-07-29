@@ -100,7 +100,7 @@ class OctNode:
     def GenerateChildren(self, points, masses, ids, leaves):
         """Generates the node's children"""
         quadrant_index = (points > self.center)  #does all comparisons needed to determine points' octants
-        for i in range(2): #looping over the 8 octants
+        for i in range(2): #looping over the 4 quadrants
             for j in range(2):
                 in_quadrant = np.all(quadrant_index == np.bool_([i,j]), axis=1)
                 if not np.any(in_quadrant): continue           # if no particles, don't make a node
@@ -163,6 +163,7 @@ class Okolje:
         
         self.barva = (255,255,255)
         self.G = 1
+        self.A = 0.7
         self.particle_functions1 = []
         self.particle_functions2 = []
         self.function_dict = {
@@ -205,7 +206,7 @@ class Okolje:
             self.delci.append(delec)
     
     def update(self):
-        GravAccel(self.delci, G = self.G) #ta funkcija jim že spremeni hitrost
+        GravAccel(self.delci, G = self.G, thetamax=self.A) #ta funkcija jim že spremeni hitrost
         for i, delec in enumerate(self.delci):
             for f in self.particle_functions1:
                 f(delec)

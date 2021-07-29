@@ -12,3 +12,7 @@ space - poženi/ustavi simulacijo
 - - zoom out 
 puščice - premik po zaslonu
 slider G (levo spodaj) za spremembo gravitacijske konstante G
+slider A (levo spodaj) za spremembo natančnosti. 0 - Upošteva sile vseh posameznih delcev na delec.
+                                                 1 - Upošteva silo težišča sistema na delec
+
+Število krogov zanke na posodobitev nadzoruješ s gumboma + in -
